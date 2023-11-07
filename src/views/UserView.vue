@@ -9,14 +9,14 @@
                 <div class="menu"></div>
                 <!-- 功能 -->
                 <div class="user-info">
-                    <el-button type="primary">发帖</el-button>
+                    <el-button type="primary" @click="jumpToPost">发帖</el-button>
                     <el-button type="primary">搜索</el-button>
                     <el-button type="primary" @click="login(0)">登录</el-button>
                     <el-button type="primary" @click="login(1)">注册</el-button>
                 </div>
             </div>
         </div>
-        <div>
+        <div class="main">
             <router-view></router-view>
         </div>
         <!-- login and register -->
@@ -39,10 +39,6 @@ const ShowDialog = ref(false);
 const loginref = ref()
 const login = (type) => {
     loginref.value.showPannel(type);
-    let result = proxy.Request({
-        url: "wqe",
-        params: {},
-    })
 }
 
 
@@ -55,7 +51,9 @@ const closeDialog = () => {
     ShowDialog.value = false;
 }
 
-
+const jumpToPost = () => {
+    router.push({ path: '/userPost' })
+}
 
 
 
@@ -89,5 +87,12 @@ const closeDialog = () => {
 .user-info {
     width: 25%;
     display: flex;
+}
+
+.main {
+    margin: 5px auto;
+    width: 80%;
+    height: 80%;
+    box-sizing: border-box;
 }
 </style>

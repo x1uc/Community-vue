@@ -15,7 +15,7 @@ const message = {
     },
     success: (msg, callback) => {
         ElMessage({
-            type: "seccess",
+            type: "success",
             message: msg,
             duration: 2000,
             onClose: () => {

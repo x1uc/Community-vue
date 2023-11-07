@@ -1,6 +1,5 @@
 <template>
     <div class="login-dialog">
-        <span>{{ formData.email }}</span>
         <Dialog :show="dialogConfig.show" :title="dialogConfig.title" :buttons="dialogConfig.buttons" width="400px"
             :showCancel="false" @close="dialogConfig.show = false">
             <el-form :model="formData" :rules="rules" ref="formDataRef" label-width="80px" @submit.prevent>
@@ -13,7 +12,7 @@
                     <el-form-item prop="emailCode" class="emailCode">
                         <el-input size="large" clearable placeholder="请输入验证码" v-model="formData.emailCode"
                             style="width: 50%;"></el-input>
-                        <el-button type="primary">获取验证码</el-button>
+                        <el-button type="primary" :disabled="disabled" @click="sendCode">{{ codeBtnMsg }}</el-button>
                     </el-form-item>
                 </div>
 
@@ -28,10 +27,6 @@
                 </el-form-item>
 
 
-                <el-form-item prop="Repassword" v-if="opType == 1">
-                    <el-input size="large" clearable placeholder="请再次输入密码" v-model="formData.Repassword"></el-input>
-                </el-form-item>
-
                 <el-form-item prop="checkCode">
                     <div class="check-code-panel">
                         <div>
@@ -44,7 +39,8 @@
                     </div>
                 </el-form-item>
                 <el-form-item>
-                    <el-button class="login-button" type="primary">登录</el-button>
+                    <el-button class="login-button" type="primary" v-if="opType == 0" @click="login">登录</el-button>
+                    <el-button class="login-button" type="primary" v-if="opType == 1" @click="register">注册</el-button>
                 </el-form-item>
             </el-form>
         </Dialog>
@@ -53,29 +49,22 @@
 </template>
 
 <script setup>
+import axios from 'axios';
 import { ref, getCurrentInstance, reactive, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
-
+const codeBtnMsg = ref("验证码发送")
+const loginStatus = ref(false);
+const disabled = ref(false)
 const api = {
     checkCode: "https://pic1.zhimg.com/v2-3b4fc7e3a1195a081d0259246c38debc_720w.jpg?source=172ae18b"
 }
-
+const regEmail = ref(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)
 const checkCodeUrl = ref(api.checkCode)
 const changeCheckCode = (type) => {
     console.log("Login 63");
-}
-
-
-const checkRepassword = (rule, value, callback) => {
-    if (value !== formData.value.password) {
-        callback(new Error(rule.message));
-    }
-    else {
-        callback();
-    }
 }
 
 const formData = ref({
@@ -91,10 +80,6 @@ const rules = {
         { required: true, message: "请输入密码" },
         { validator: proxy.Verify.password, message: "以字母开头 长度在6~18之间" },
     ],
-    Repassword: [
-        { required: true, message: "请输入密码" },
-        { validator: checkRepassword, message: "两次输入的密码不一致" },
-    ],
     emailCode: [
         { required: true, message: "请输入邮箱验证码" },
     ],
@@ -108,6 +93,8 @@ const dialogConfig = reactive({
     title: "标题",
 })
 
+
+// 初始化登陆注册表单
 const reSetForm = () => {
     dialogConfig.show = true;
     console.log(opType.value);
@@ -122,13 +109,132 @@ const reSetForm = () => {
     })
 }
 
+const sendCode = () => {
+    console.log(formData);
+    if (!formData.value.email) {
+        proxy.Message.error("邮箱不能为空");
+        return;
+    }
+    if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(formData.value.email)) {
+        proxy.Message.error("邮箱格式错误");
+        return;
+    }
+    // 发送验证码
+    axios({
+        method: 'post',
+        url: "/api/user/code",
+        data: {
+            email: formData.value.email
+        },
+    }).then((res) => {
+        if (res.data.code == 200) {
+            proxy.Message.success(res.data.msg);
+        } else {
+            proxy.Message.error(res.data.msg);
+
+        }
+    })
+    // 禁用按钮
+    disabled.value = true;
+    // 按钮倒计时
+    let i = 60;
+    codeBtnMsg.value = (i--) + '秒后可重发'
+    let taskId = setInterval(() => codeBtnMsg.value = (i--) + '秒后可重发', 1000);
+    setTimeout(() => {
+        disabled.value = false;
+        clearInterval(taskId);
+        codeBtnMsg.value = "发送验证码";
+    }, 59000)
+}
+
+
+const login = () => {
+    if (!formData.value.email) {
+        proxy.Message.error("邮箱不能为空");
+        return;
+    }
+    if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(formData.value.email)) {
+        proxy.Message.error("邮箱格式错误");
+        return;
+    }
+    if (!formData.value.password) {
+        proxy.Message.error("密码不能为空");
+        return;
+    }
+    axios({
+        method: 'post',
+        url: "/api/user/login",
+        data: {
+            email: formData.value.email,
+            password: formData.value.password
+        },
+    }).then((res) => {
+        if (res.data.code == 200) {
+            sessionStorage.setItem("authorization", res.data.msg);
+            proxy.Message.success("登录成功！")
+            dialogConfig.show = false;
+        }
+        else {
+            proxy.Message.error(res.data.msg);
+        }
+    }).catch((error) => {
+        proxy.Message.error("错误");
+    })
+}
+
+
+const register = () => {
+
+    if (!formData.value.email) {
+        proxy.Message.error("邮箱不能为空");
+        return;
+    }
+    if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(formData.value.email)) {
+        proxy.Message.error("邮箱格式错误");
+        return;
+    }
+    if (!formData.value.password) {
+        proxy.Message.error("密码不能为空");
+        return;
+    }
+    if (!formData.value.NickName) {
+        proxy.Message.error("昵称不能为空");
+        return;
+    }
+
+    if (!formData.value.emailCode) {
+        proxy.Message.error("邮箱验证码不能为空");
+        return;
+    }
+    axios({
+        method: 'post',
+        url: "/api/user/register",
+        data: {
+            email: formData.value.email,
+            password: formData.value.password,
+            NickName: formData.value.NickName,
+            emailCode: formData.value.emailCode
+        },
+    }).then((res) => {
+        if (res.data.code == 200) {
+            proxy.Message.success(res.data.msg);
+        } else {
+            proxy.Message.error(res.data.msg);
+        }
+    })
+}
+
+
+
+
+
 // 0 是 登录 1 是注册
 const opType = ref();
 const showPannel = (type) => {
     opType.value = type;
     reSetForm();
 }
-defineExpose({ showPannel })  //defineExpose 用于暴露一些方法或数据给父组件调用
+defineExpose({ showPannel, loginStatus })  //defineExpose 用于暴露一些方法或数据给父组件调用
 </script>
 <style lang="scss" scoped>
 .check-code-panel {

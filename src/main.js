@@ -12,11 +12,31 @@ import Dialog from "@/components/DialogCon.vue"
 import regs from '@/utils/Verify'
 import Message from '@/utils/message'
 import Request from "./utils/request";
+
+
+import { mavonEditor } from "mavon-editor";
+import 'mavon-editor/dist/css/index.css';
+
+import VueMarkdownEditor from '@kangc/v-md-editor';
+import '@kangc/v-md-editor/lib/style/base-editor.css';
+import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js';
+import '@kangc/v-md-editor/lib/theme/style/vuepress.css';
+import Prism from 'prismjs';
+
+VueMarkdownEditor.use(vuepressTheme, {
+    Prism,
+  });
+
+
 //图标 图标在附件中
 const app = createApp(App);
+
+app.use(VueMarkdownEditor);
 app.use(store);
 app.use(router);
 app.use(ElementPlus);
+app.use(mavonEditor);
+
 app.config.globalProperties.VueCookies = VueCookies;
 app.config.globalProperties.globalInfo = {
     bodyWidth: 80,
