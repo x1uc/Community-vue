@@ -30,12 +30,10 @@ VueMarkdownEditor.use(vuepressTheme, {
 
 //图标 图标在附件中
 const app = createApp(App);
-
 app.use(VueMarkdownEditor);
 app.use(store);
 app.use(router);
 app.use(ElementPlus);
-app.use(mavonEditor);
 
 app.config.globalProperties.VueCookies = VueCookies;
 app.config.globalProperties.globalInfo = {

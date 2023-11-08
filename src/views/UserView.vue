@@ -41,6 +41,11 @@ const login = (type) => {
     loginref.value.showPannel(type);
 }
 
+const created = () => {
+    router.push("/mainPost");
+}
+created();
+
 
 const buttons = [{
     type: "primary",
