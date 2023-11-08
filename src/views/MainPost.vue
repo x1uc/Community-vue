@@ -2,12 +2,11 @@
     <div>
 
         <div v-for="postVo in records" :key="postVo">
-            <el-card @click="toPost(postVo.post.id)" class="card">
+            <el-card @click="toPost(postVo.id)" class="card">
                 {{ postVo.userName }}
-                {{ postVo.post.createTime }}
+                {{ postVo.createTime }}
                 <br>
-                <h1>{{ postVo.post.title }}</h1>
-                <div class="markdown-body" v-html="postVo.content"></div>
+                <h1>{{ postVo.title }}</h1>
             </el-card>
         </div>
         <div class="demo-pagination-block">
@@ -38,30 +37,46 @@ const disabled = ref(false)
 const tatal = ref(400)
 //分页函数
 const handleCurrentChange = () => {
-    // axios({
-    //     url: '/post/page',
-    //     data: {
-    //         pageSize: pageSize.value,
-    //         currentPage: currentPage.value,
-    //     }
-    // })
-    console.log("123");
+    axios({
+        method: 'post',
+        url: '/api/post/page',
+        data: {
+            pageSize: parseInt(pageSize.value),
+            currentPage: parseInt(currentPage.value),
+        }
+    }).then((res) => {
+        tatal.value = res.data.data.total;
+        records.value = res.data.data.records;
+    })
 }
 
 const handleSizeChange = () => {
-    console.log("456");
+    currentPage.value = 1;
+    axios({
+        method: 'post',
+        url: '/api/post/page',
+        data: {
+            pageSize: pageSize.value,
+            currentPage: currentPage.value,
+        }
+    }).then((res) => {
+        tatal.value = res.data.data.total;
+        records.value = res.data.data.records;
+    })
 }
 //上方是分页函数 与 参数
-
-
-
 
 const getPost = () => {
     axios({
         method: 'post',
-        url: 'api/post/page',
+        url: '/api/post/page',
+        data: {
+            pageSize: parseInt(pageSize.value),
+            currentPage: parseInt(currentPage.value),
+        }
     }).then((res) => {
-        records.value = res.data.data;
+        tatal.value = res.data.data.total;
+        records.value = res.data.data.records;
     })
 }
 getPost();
