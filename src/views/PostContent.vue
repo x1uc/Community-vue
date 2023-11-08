@@ -91,6 +91,7 @@ const addPostComment = () => {
         if (res.data.code == 200) {
             proxy.Message.success(res.data.msg);
             commentInput.value = "";
+            create();
         }
         else {
             proxy.Message.error(res.data.msg);
