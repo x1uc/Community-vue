@@ -7,6 +7,9 @@
                 {{ postVo.createTime }}
                 <br>
                 <h1>{{ postVo.title }}</h1>
+                <el-icon :size="20" >
+                <TrophyBase />
+                </el-icon>{{ postVo.liked }}
             </el-card>
         </div>
         <div class="demo-pagination-block">

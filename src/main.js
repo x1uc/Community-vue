@@ -5,6 +5,7 @@ import store from "./store";
 import VueCookies from "vue-cookies";
 //引入element plus
 import ElementPlus from "element-plus";
+import * as Icons from '@element-plus/icons-vue'
 import "element-plus/dist/index.css";
 //我们使用sass 所以这里将base.css 改成base.scss
 import '@/assets/base.scss';
@@ -34,7 +35,9 @@ app.use(VueMarkdownEditor);
 app.use(store);
 app.use(router);
 app.use(ElementPlus);
-
+for (let i in Icons) {
+  app.component(i, Icons[i])
+}
 app.config.globalProperties.VueCookies = VueCookies;
 app.config.globalProperties.globalInfo = {
     bodyWidth: 80,
