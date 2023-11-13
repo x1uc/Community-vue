@@ -13,6 +13,7 @@
                     <el-button type="primary">搜索</el-button>
                     <el-button type="primary" @click="login(0)">登录</el-button>
                     <el-button type="primary" @click="login(1)">注册</el-button>
+                    <el-button type="primary" @click="Notice">通知中心</el-button>
                 </div>
             </div>
         </div>
@@ -58,6 +59,10 @@ const closeDialog = () => {
 
 const jumpToPost = () => {
     router.push({ path: '/userPost' })
+}
+
+const Notice = () => {
+    router.push("/notice");
 }
 
 
