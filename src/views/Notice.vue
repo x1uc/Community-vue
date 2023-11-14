@@ -9,7 +9,7 @@
                         </el-icon>
                         <span>点赞通知</span>
                     </el-menu-item>
-                    <el-menu-item index="3">
+                    <el-menu-item index="3" @click="getMessage(comment)">
                         <el-icon>
                             <document />
                         </el-icon>
@@ -24,7 +24,7 @@
                     <div style="height: 200px;"></div>
                 </el-menu>
             </el-col>
-            <div>
+            <div v-if="nowSpace == 1">
                 <div v-for="item in content" :key="item">
                     <el-card style="width: 900px; min-height: 120px;">
                         <div>
@@ -34,8 +34,27 @@
                         </div>
                         <div style="margin-top: 10px;">
                             给你的文章
-                            <a href="javascrip:void(0)"> {{ item.content }}</a>
-                            希望你能再接再厉，发布优质帖子
+                            <a :href="'#/postContent' + item.entityId" style="text-decoration: none;"> {{ item.title }}</a>
+                            点赞，希望你能再接再厉，发布优质帖子
+                        </div>
+                    </el-card>
+                </div>
+            </div>
+            <div v-if="nowSpace == 2">
+                <div v-for="item in content" :key="item">
+                    <el-card style="width: 900px; min-height: 120px;">
+                        <div>
+                            {{ item.formUser }}
+                            <span>{{ space }}</span>
+                            {{ kfc(item.dateTime) }}
+                        </div>
+                        <div style="margin-top: 10px;">
+                            在文章
+                            <a :href="'#/postContent' + item.entityId" style="text-decoration: none;"> {{ item.title }}</a>
+                            对你进行了回复，内容为：
+                        </div>
+                        <div style="margin-top: 20px;">
+                            {{ item.content }}
                         </div>
                     </el-card>
                 </div>
@@ -55,6 +74,8 @@ const router = useRouter();
 const content = ref();
 const space = ref("                   ")
 const like = "like"
+const comment = "comment";
+const nowSpace = ref(1);
 
 const kfc = (time) => { // 请将 "时间戳" 替换为实际的时间戳
     let tm = parseInt(time);
@@ -71,6 +92,13 @@ const kfc = (time) => { // 请将 "时间戳" 替换为实际的时间戳
 }
 
 const getMessage = (str) => {
+    if (str == 'like')
+        nowSpace.value = 1;
+    else if (str == 'comment')
+        nowSpace.value = 2;
+    else
+        nowSpace.value = 3;
+
     let token = sessionStorage.getItem("authorization");
     axios({
         url: "/api/message/" + str,
@@ -78,7 +106,10 @@ const getMessage = (str) => {
             authorization: token
         }
     }).then(res => {
-        console.log(res);
+        if (res.data.code != 200) {
+            proxy.Message.error("请先登录");
+            return;
+        }
         content.value = res.data.data;
     })
 }

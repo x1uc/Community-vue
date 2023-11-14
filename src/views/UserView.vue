@@ -2,7 +2,7 @@
     <div>
         <div class="header">
             <div class="header-content" :style="{ width: proxy.globalInfo.bodyWidth + '%' }">
-                <div class="logo">
+                <div class="logo" @click="jumpMain">
                     <div class="logo-content">SYUCTACM</div>
                 </div>
                 <!-- 分类 -->
@@ -65,6 +65,9 @@ const Notice = () => {
     router.push("/notice");
 }
 
+const jumpMain = () => {
+    router.push({path:"/mainPost"});
+}
 
 
 </script>
@@ -88,6 +91,7 @@ const Notice = () => {
     display: flex;
     align-items: center;
     margin: 0 auto;
+    cursor: pointer;
 }
 
 .menu {
