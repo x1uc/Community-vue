@@ -13,7 +13,9 @@
                     <el-button type="primary">搜索</el-button>
                     <el-button type="primary" @click="login(0)">登录</el-button>
                     <el-button type="primary" @click="login(1)">注册</el-button>
-                    <el-button type="primary" @click="Notice">通知中心</el-button>
+                    <el-button type="primary" @click="Notice">通知中心
+                        <div class="red_point" v-if="infoRedPoint !=0">{{ infoRedPoint }}</div>
+                    </el-button>
                 </div>
             </div>
         </div>
@@ -28,6 +30,7 @@
 </template>
 
 <script setup>
+import axios from 'axios';
 import { ref, getCurrentInstance } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Login from './Login.vue';
@@ -35,9 +38,19 @@ const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
 const ShowDialog = ref(false);
-
-
 const loginref = ref()
+const infoRedPoint = ref(0);
+
+
+const log = () => {
+    console.log(loginref.value)
+}
+
+
+
+
+
+
 const login = (type) => {
     loginref.value.showPannel(type);
 }
@@ -66,8 +79,30 @@ const Notice = () => {
 }
 
 const jumpMain = () => {
-    router.push({path:"/mainPost"});
+    router.push({ path: "/mainPost" });
 }
+
+const getUnread = () => {
+    let token = sessionStorage.getItem("authorization");
+    if (token == null || token == "") {
+        return;
+    }
+    else {
+        axios({
+            url: "/api/message/unread",
+            headers: {
+                authorization: token
+            }
+        }).then((res) => {
+            if (res.data.code == 200) {
+                infoRedPoint.value = res.data.data;
+                return;
+            }
+        })
+    }
+}
+getUnread();
+
 
 
 </script>
@@ -108,5 +143,12 @@ const jumpMain = () => {
     width: 80%;
     height: 80%;
     box-sizing: border-box;
+}
+
+.red_point {
+    height: 15px;
+    width: 15px;
+    border-radius: 40%;
+    background-color: red;
 }
 </style>

@@ -50,6 +50,7 @@
 
 <script setup>
 import axios from 'axios';
+import { defineExpose } from 'vue';
 import { ref, getCurrentInstance, reactive, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 const { proxy } = getCurrentInstance();
@@ -172,6 +173,7 @@ const login = () => {
         if (res.data.code == 200) {
             sessionStorage.setItem("authorization", res.data.msg);
             proxy.Message.success("登录成功！")
+            getUnreadMsg();
             dialogConfig.show = false;
         }
         else {
@@ -223,6 +225,21 @@ const register = () => {
         }
     })
 }
+const infoRedPoint = ref(0);
+const getUnreadMsg = () => {
+    let token = sessionStorage.getItem("authorization");
+    axios({
+        url: "/api/message/unread",
+        headers: {
+            authorization: token
+        }
+    }).then((res) => {
+        if (res.data.code == 200) {
+            infoRedPoint.value = res.data.data;
+            return;
+        }
+    })
+}
 
 
 
@@ -234,7 +251,7 @@ const showPannel = (type) => {
     opType.value = type;
     reSetForm();
 }
-defineExpose({ showPannel, loginStatus })  //defineExpose 用于暴露一些方法或数据给父组件调用
+defineExpose({ showPannel, loginStatus, infoRedPoint, getUnreadMsg })  //defineExpose 用于暴露一些方法或数据给父组件调用
 </script>
 <style lang="scss" scoped>
 .check-code-panel {

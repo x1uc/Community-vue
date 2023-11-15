@@ -9,11 +9,16 @@
                         </el-icon>
                         <span>点赞通知</span>
                     </el-menu-item>
-                    <el-menu-item index="3" @click="getMessage(comment)">
+                    <el-menu-item index="3" @click="commentHandleCurrent">
                         <el-icon>
                             <document />
                         </el-icon>
                         <span>评论通知</span>
+                        <div class="unComment" v-if="unreadMsg != 0">
+                            <div>
+                                {{ unreadMsg }}
+                            </div>
+                        </div>
                     </el-menu-item>
                     <el-menu-item index="4">
                         <el-icon>
@@ -39,6 +44,12 @@
                         </div>
                     </el-card>
                 </div>
+                <div class="demo-pagination-block">
+                    <el-pagination v-model:current-page="likeCurrentPage" v-model:page-size="likePageSize"
+                        :page-sizes="[10]" :small="small" :disabled="disabled" :background="background"
+                        layout="total, sizes, prev, pager, next, jumper" :total="likeTotal"
+                        @current-change="likeHandleCurrentChange" />
+                </div>
             </div>
             <div v-if="nowSpace == 2">
                 <div v-for="item in content" :key="item">
@@ -57,6 +68,12 @@
                             {{ item.content }}
                         </div>
                     </el-card>
+                </div>
+                <div class="demo-pagination-block">
+                    <el-pagination v-model:current-page="commentCurrentPage" v-model:page-size="commentPageSize"
+                        :page-sizes="[10]" :small="small" :disabled="disabled"
+                        layout="total, sizes, prev, pager, next, jumper" :total="commentTotal"
+                        @current-change="commentHandleCurrent" />
                 </div>
             </div>
         </el-row>
@@ -77,6 +94,18 @@ const like = "like"
 const comment = "comment";
 const nowSpace = ref(1);
 
+
+const likeCurrentPage = ref(1);
+const likePageSize = ref(10);
+const likeTotal = ref(0);
+
+
+const commentCurrentPage = ref(1);
+const commentPageSize = ref(10);
+const commentTotal = ref(0);
+
+const unreadMsg = ref(0);
+
 const kfc = (time) => { // 请将 "时间戳" 替换为实际的时间戳
     let tm = parseInt(time);
     let date = new Date(tm);
@@ -86,7 +115,6 @@ const kfc = (time) => { // 请将 "时间戳" 替换为实际的时间戳
     let day = date.getDate().toString().padStart(2, '0');
     let hours = date.getHours().toString().padStart(2, '0');
     let minutes = date.getMinutes().toString().padStart(2, '0');
-
     let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
     return formattedDateTime;
 }
@@ -104,16 +132,86 @@ const getMessage = (str) => {
         url: "/api/message/" + str,
         headers: {
             authorization: token
-        }
+        },
+        data: {
+            currentPage: likeCurrentPage.value,
+            pageSize: '10'
+        },
+        method: 'post'
     }).then(res => {
         if (res.data.code != 200) {
             proxy.Message.error("请先登录");
             return;
         }
-        content.value = res.data.data;
+        content.value = res.data.data.records;
+        likeTotal.value = res.data.data.total;
     })
 }
+//getMessage(like);
+
+const likeHandleCurrentChange = () => {
+    getMessage('like')
+}
+
+const commentHandleCurrent = () => {
+    unreadMsg.value = 0;
+    let str = 'comment';
+    nowSpace.value = 2;
+    let token = sessionStorage.getItem("authorization");
+    axios({
+        url: "/api/message/" + str,
+        headers: {
+            authorization: token
+        },
+        data: {
+            currentPage: commentCurrentPage.value,
+            pageSize: '10'
+        },
+        method: 'post'
+    }).then(res => {
+        if (res.data.code != 200) {
+            proxy.Message.error("请先登录");
+            return;
+        }
+        content.value = res.data.data.records;
+        commentTotal.value = res.data.data.total;
+    })
+}
+
 getMessage(like);
+
+
+
+const unreadComment = () => {
+    let token = sessionStorage.getItem("authorization");
+    axios({
+        url: "/api/message/unComment",
+        headers: {
+            authorization: token
+        },
+        method: 'post'
+    }).then((res) => {
+        if (res.data.code == 200) {
+            unreadMsg.value = res.data.data;
+        }
+    })
+}
+
+
+unreadComment();
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </script>
@@ -122,5 +220,14 @@ getMessage(like);
 .notice {
     height: 100%;
     width: 100%;
+}
+
+.unComment {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: red;
+    line-height: 20px;
+    text-align: center;
 }
 </style>
