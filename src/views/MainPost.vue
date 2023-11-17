@@ -1,14 +1,17 @@
 <template>
     <div>
 
-        <div v-for="postVo in records" :key="postVo">
+        <div v-for="postVo in  records " :key="postVo">
             <el-card @click="toPost(postVo.id)" class="card">
-                {{ postVo.userName }}
+                <div style="display: flex;">
+                    <el-avatar :src="/api/ + postVo.avatar"></el-avatar>
+                    <h3 style="margin-top: 10px;"> {{ postVo.userName }} </h3>
+                </div>
                 {{ postVo.createTime }}
                 <br>
                 <h1>{{ postVo.title }}</h1>
-                <el-icon :size="20" >
-                <TrophyBase />
+                <el-icon :size="20">
+                    <TrophyBase />
                 </el-icon>{{ postVo.liked }}
             </el-card>
         </div>

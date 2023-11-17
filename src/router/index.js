@@ -4,6 +4,7 @@ import UserPost from '../views/UserPost.vue';
 import MainPost from '../views/MainPost.vue';
 import PostContent from '../views/PostContent.vue';
 import Notice from '../views/Notice.vue';
+import Myspace from '../views/Myspace.vue';
 const routes = [
   {
     path: '/',
@@ -29,6 +30,11 @@ const routes = [
         path: '/Notice',
         name: "Notice",
         component: Notice,
+        props: true
+      }, {
+        path: '/Myspace',
+        name: "Myspace",
+        component: Myspace,
         props: true
       }
     ]

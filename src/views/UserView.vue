@@ -10,11 +10,11 @@
                 <!-- 功能 -->
                 <div class="user-info">
                     <el-button type="primary" @click="jumpToPost">发帖</el-button>
-                    <el-button type="primary">搜索</el-button>
+                    <el-button type="primary" @click="junpMyspace">搜索</el-button>
                     <el-button type="primary" @click="login(0)">登录</el-button>
                     <el-button type="primary" @click="login(1)">注册</el-button>
                     <el-button type="primary" @click="Notice">通知中心
-                        <div class="red_point" v-if="infoRedPoint !=0">{{ infoRedPoint }}</div>
+                        <div class="red_point" v-if="infoRedPoint != 0">{{ infoRedPoint }}</div>
                     </el-button>
                 </div>
             </div>
@@ -102,7 +102,10 @@ const getUnread = () => {
     }
 }
 getUnread();
-
+ 
+const junpMyspace = () => {
+    router.push({ path: "/Myspace" });
+}
 
 
 </script>
