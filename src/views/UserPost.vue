@@ -72,7 +72,7 @@ const submitForm = () => {
             }).then((res) => {
                 if (res.data.code == 200) {
                     proxy.Message.success(res.data.msg);
-                    router.push("/")
+                    router.push("/mainPost");
                 }
                 else {
                     proxy.Message.error(res.data.msg);

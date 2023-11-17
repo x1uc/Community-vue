@@ -68,7 +68,9 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from 'vue';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-dark.css'	//样式
+import { ref, getCurrentInstance, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import MarkdownIt from 'markdown-it';
 import axios from 'axios'
@@ -101,7 +103,7 @@ const create = () => {
         likes.value = result.data.data.postDto.post.liked;
         const md = new MarkdownIt();
         data.value = md.render(str.toString());
-        console.log(data);
+        highlightCode();
     }).catch((err) => {
         console.log(err);
         proxy.Message.error("错误！！");
@@ -223,6 +225,17 @@ const getInconColor = () => {
         return "blue";
     }
 }
+
+const highlightCode = () => {
+    nextTick(() => {
+        let codes = document.querySelectorAll("pre code");
+        codes.forEach(item => {
+            hljs.highlightBlock(item);
+        })
+    })
+}
+
+
 
 
 

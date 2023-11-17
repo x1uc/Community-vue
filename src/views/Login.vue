@@ -27,7 +27,7 @@
                 </el-form-item>
 
 
-                <el-form-item prop="checkCode">
+                <el-form-item prop="checkCode" v-if="1 == 2">
                     <div class="check-code-panel">
                         <div>
                             <el-input size="large" clearable placeholder="请输入验证码" v-model="formData.checkCode"></el-input>
@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import axios from 'axios';
+import axios, { getAdapter } from 'axios';
 import { defineExpose } from 'vue';
 import { ref, getCurrentInstance, reactive, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -59,8 +59,11 @@ const router = useRouter();
 const codeBtnMsg = ref("验证码发送")
 const loginStatus = ref(false);
 const disabled = ref(false)
+
+const emit = defineEmits(["getAvatar"])
+
 const api = {
-    checkCode: "https://pic1.zhimg.com/v2-3b4fc7e3a1195a081d0259246c38debc_720w.jpg?source=172ae18b"
+    checkCode: "www.baidu.com"
 }
 const regEmail = ref(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)
 const checkCodeUrl = ref(api.checkCode)
@@ -173,7 +176,9 @@ const login = () => {
         if (res.data.code == 200) {
             sessionStorage.setItem("authorization", res.data.msg);
             proxy.Message.success("登录成功！")
+            loginStatus.value = 1;
             getUnreadMsg();
+            emit('getAvatar');
             dialogConfig.show = false;
         }
         else {
@@ -236,6 +241,7 @@ const getUnreadMsg = () => {
     }).then((res) => {
         if (res.data.code == 200) {
             infoRedPoint.value = res.data.data;
+
             return;
         }
     })
