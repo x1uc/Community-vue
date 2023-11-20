@@ -5,7 +5,7 @@
                 <el-menu default-active="2" class="el-menu-vertical-demo">
                     <el-menu-item index="2" @click="getMessage(like)">
                         <el-icon>
-                            <document />
+                            <TrophyBase />
                         </el-icon>
                         <span>点赞通知</span>
                     </el-menu-item>

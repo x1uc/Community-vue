@@ -11,7 +11,8 @@
                 <div class="menu"></div>
                 <!-- 功能 -->
                 <div class="user-info">
-                    <div class="select" style="margin-top: 30px; margin-right: 25px;" @click="jumpToPost">
+                    <div class="select" style="margin-top: 30px; margin-right: 25px; box-sizing: border-box;"
+                        @click="jumpToPost">
                         我要发帖
                     </div>
                     <div class="select" style="margin-top: 30px;margin-right: 25px; display: flex;" @click="Notice">
@@ -32,7 +33,7 @@
                         </div>
                         <div style="margin-right: 25px; margin-top:15px;" class="select">
                             <div class="demo-basic--circle">
-                                <div class="block">
+                                <div class="block" @click="junpMyspace">
                                     <el-avatar :size="50" :src="circleUrl" />
                                 </div>
                             </div>
@@ -43,7 +44,6 @@
                     <el-button type="primary" @click="login(0)">登录</el-button>
                     <el-button type="primary" @click="login(1)">注册</el-button>
                     <el-button type="primary" @click="Notice">通知中心
-                       
                     </el-button> -->
                 </div>
             </div>

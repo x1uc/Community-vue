@@ -220,11 +220,12 @@ const register = () => {
             email: formData.value.email,
             password: formData.value.password,
             NickName: formData.value.NickName,
-            emailCode: formData.value.emailCode
+            emailCode: formData.value.emailCode,
         },
     }).then((res) => {
         if (res.data.code == 200) {
             proxy.Message.success(res.data.msg);
+            dialogConfig.show = false;
         } else {
             proxy.Message.error(res.data.msg);
         }
