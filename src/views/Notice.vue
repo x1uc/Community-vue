@@ -33,13 +33,14 @@
                 <div v-for="item in content" :key="item">
                     <el-card style="width: 900px; min-height: 120px;">
                         <div>
-                            {{ item.formUser }}
+                            {{ item.fromUserName }}
                             <span>{{ space }}</span>
-                            {{ kfc(item.dateTime) }}
+                            {{ item.dateTime }}
                         </div>
                         <div style="margin-top: 10px;">
                             给你的文章
-                            <a :href="'#/postContent' + item.entityId" style="text-decoration: none;"> {{ item.title }}</a>
+                            <a :href="'#/postContent' + item.entityId" style="text-decoration: none;"> {{ item.title
+                                }}</a>
                             点赞，希望你能再接再厉，发布优质帖子
                         </div>
                     </el-card>
@@ -57,11 +58,12 @@
                         <div>
                             {{ item.formUser }}
                             <span>{{ space }}</span>
-                            {{ kfc(item.dateTime) }}
+                            {{ item.dateTime }}
                         </div>
                         <div style="margin-top: 10px;">
                             在文章
-                            <a :href="'#/postContent' + item.entityId" style="text-decoration: none;"> {{ item.title }}</a>
+                            <a :href="'#/postContent' + item.entityId" style="text-decoration: none;">
+                                {{ item.title }} </a>
                             对你进行了回复，内容为：
                         </div>
                         <div style="margin-top: 20px;">
@@ -118,6 +120,21 @@ const kfc = (time) => { // 请将 "时间戳" 替换为实际的时间戳
     let formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
     return formattedDateTime;
 }
+/**
+ * 将日期格式化为指定格式
+ * @param val  当前时间： 例- new Data();
+ * @param pattern  转化的格式 例- yyyy年-MM月-dd日 hh时:mm分:ss秒 
+ * @returns 返回格式化后的时间
+ */
+const formatDate = (val, pattern) => {
+    if (!val) {
+        return null;
+    }
+    if (!pattern) {
+        pattern = "yyyy-MM-dd hh:mm:ss"
+    }
+    return new Date(val).format(pattern);
+}
 
 const getMessage = (str) => {
     if (str == 'like')
@@ -127,11 +144,11 @@ const getMessage = (str) => {
     else
         nowSpace.value = 3;
 
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     axios({
         url: "/api/message/" + str,
         headers: {
-            authorization: token
+            token: token
         },
         data: {
             currentPage: likeCurrentPage.value,
@@ -143,8 +160,8 @@ const getMessage = (str) => {
             proxy.Message.error("请先登录");
             return;
         }
-        content.value = res.data.data.records;
-        likeTotal.value = res.data.data.total;
+        content.value = res.data.data.messageList;
+        likeTotal.value = res.data.data.count;
     })
 }
 //getMessage(like);
@@ -157,11 +174,11 @@ const commentHandleCurrent = () => {
     unreadMsg.value = 0;
     let str = 'comment';
     nowSpace.value = 2;
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     axios({
         url: "/api/message/" + str,
         headers: {
-            authorization: token
+            token: token
         },
         data: {
             currentPage: commentCurrentPage.value,
@@ -173,8 +190,8 @@ const commentHandleCurrent = () => {
             proxy.Message.error("请先登录");
             return;
         }
-        content.value = res.data.data.records;
-        commentTotal.value = res.data.data.total;
+        content.value = res.data.data.messageList;
+        commentTotal.value = res.data.data.count;
     })
 }
 
@@ -183,13 +200,13 @@ getMessage(like);
 
 
 const unreadComment = () => {
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     axios({
-        url: "/api/message/unComment",
+        url: "/api/message/unReadComment",
         headers: {
-            authorization: token
+            token: token
         },
-        method: 'post'
+        method: 'get'
     }).then((res) => {
         if (res.data.code == 200) {
             unreadMsg.value = res.data.data;
@@ -199,18 +216,6 @@ const unreadComment = () => {
 
 
 unreadComment();
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

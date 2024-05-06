@@ -79,9 +79,10 @@ const log = () => {
 const circleUrl = ref();
 const baseUrl = '/api/';
 const getAvatar = () => {
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     if (token == null || token == "") {
         loginStatus.value = 0;
+        return ;
     }
     else {
         loginStatus.value = 1;
@@ -89,7 +90,7 @@ const getAvatar = () => {
     axios({
         url: "/api/user/avatar",
         headers: {
-            authorization: token
+            token : token
         },
     }).then((res) => {
         circleUrl.value = baseUrl + res.data.data;
@@ -130,15 +131,15 @@ const jumpMain = () => {
 }
 
 const getUnread = () => {
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     if (token == null || token == "") {
         return;
     }
     else {
         axios({
-            url: "/api/message/unread",
+            url: "/api/message/allUnRead",
             headers: {
-                authorization: token
+                token: token
             }
         }).then((res) => {
             if (res.data.code == 200) {

@@ -170,14 +170,14 @@ const login = () => {
         url: "/api/user/login",
         data: {
             email: formData.value.email,
-            password: formData.value.password
+            passWord: formData.value.password
         },
     }).then((res) => {
         if (res.data.code == 200) {
-            sessionStorage.setItem("authorization", res.data.msg);
+            localStorage.setItem("token", res.data.data);
             proxy.Message.success("登录成功！")
             loginStatus.value = 1;
-            getUnreadMsg();
+           // getUnreadMsg();
             emit('getAvatar');
             dialogConfig.show = false;
         }
@@ -218,8 +218,8 @@ const register = () => {
         url: "/api/user/register",
         data: {
             email: formData.value.email,
-            password: formData.value.password,
-            NickName: formData.value.NickName,
+            passWord: formData.value.password,
+            userName: formData.value.NickName,
             emailCode: formData.value.emailCode,
         },
     }).then((res) => {
@@ -237,19 +237,15 @@ const getUnreadMsg = () => {
     axios({
         url: "/api/message/unread",
         headers: {
-            authorization: token
+            token: token
         }
     }).then((res) => {
         if (res.data.code == 200) {
             infoRedPoint.value = res.data.data;
-
             return;
         }
     })
 }
-
-
-
 
 
 // 0 是 登录 1 是注册

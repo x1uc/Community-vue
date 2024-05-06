@@ -29,21 +29,23 @@
                 <el-card v-for="item in comment" :key="item">
                     <div class="comment-user-time">
                         <div class="userNameAndTime">
-                            <a href="javascript:void(0)">{{ item.user.username }} </a>
+                            <a href="javascript:void(0)">{{ item.userName }} </a>
                             {{ "发表于 " + item.comment.createTime }}
                         </div>
                         <div>
-                            <el-button common size="small" @click="replyClick(item.comment, item.comment)">回复</el-button>
+                            <el-button common size="small"
+                                @click="replyClick(item.comment, item.comment)">回复</el-button>
                         </div>
                     </div>
                     {{ item.comment.content }}
                     <div>---------------</div>
                     <div class="child" v-for="reply in item.replies" :key="reply">
                         <div>
-                            <a href="javascript:void(0)">{{ reply.user.username }}</a> 回复 <a href="javascript:void(0)">{{
-                                reply.target.username }}</a>
+                            <a href="javascript:void(0)">{{ reply.userName }}</a> 回复 <a href="javascript:void(0)">{{
+        reply.targetName }}</a>
                             <span>{{ " " + reply.comment.createTime }}</span>
-                            <el-button common size="small" @click="replyClick(reply.comment, item.comment)">回复</el-button>
+                            <el-button common size="small"
+                                @click="replyClick(reply.comment, item.comment)">回复</el-button>
                         </div>
                         {{ reply.comment.content }}
                     </div>
@@ -93,14 +95,15 @@ const NowLike = ref(false);
 
 const create = () => {
     axios({
-        url: "/api/post?id=" + id,
+        url: "/api/post/content?id=" + id,
         method: 'get',
     }).then((result) => {
         console.log(result);
-        const str = (result.data.data.postDto.post.content).toString();
-        userName.value = result.data.data.postDto.userName.toString();
-        comment.value = result.data.data.comment;
-        likes.value = result.data.data.postDto.post.liked;
+        const str = (result.data.data.post.content).toString();
+        userName.value = result.data.data.userName;
+        //userName.value = result.data.data.post.userName.toString();
+        comment.value = result.data.data.commentVos;
+        likes.value = result.data.data.likeCount;
         const md = new MarkdownIt();
         data.value = md.render(str.toString());
         highlightCode();
@@ -114,16 +117,16 @@ create();
 
 
 const addPostComment = () => {
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     axios({
         url: "api/comment/add",
         headers: {
-            authorization: token
+            token: token
         },
         method: 'post',
         data: {
             content: commentInput.value,
-            id: id,
+            entityId: id,
             type: 1
         }
     }).then((res) => {
@@ -142,12 +145,14 @@ const addPostComment = () => {
 const dialogEntityId = ref(""); //评论主题的ID
 const dialogTargetId = ref(""); // 评论人的ID
 const dialogVisible = ref(false);
+const dialogMainCommentId = ref("");
 const dialogInput = ref("");
 
-const replyClick = (comment, item) => {
+const replyClick = (comment, item) => { // comment 代表回复评论Id ，item 代表主评论id
     dialogVisible.value = true;
-    dialogEntityId.value = item.id;
+    dialogEntityId.value = comment.id;
     dialogTargetId.value = comment.userId;
+    dialogMainCommentId.value = item.id;
 }
 
 const replyPostClick = () => {
@@ -155,17 +160,19 @@ const replyPostClick = () => {
         proxy.Message.error("评论最大长度为130");
         return;
     }
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     axios({
         method: 'post',
         url: "/api/comment/addChild",
         headers: {
-            authorization: token
+            token: token
         },
         data: {
-            EntityId: dialogEntityId.value,
-            TargetId: dialogTargetId.value,
+            entityId: dialogEntityId.value,
+            targetId: dialogTargetId.value,
             content: dialogInput.value,
+            commentId: dialogMainCommentId.value,
+            postId: id,
             type: 2,
         }
     }).then((res) => {
@@ -181,12 +188,12 @@ const replyPostClick = () => {
 }
 
 const updateLike = () => {
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     axios({
-        url: "/api/post/like?id=" + id,
+        url: "/api/post/like/" + id,
         method: 'get',
         headers: {
-            authorization: token
+            token: token
         },
     }).then((res) => {
         if (res.data.code == 200) {
@@ -200,12 +207,12 @@ const updateLike = () => {
 }
 
 const likeOrNot = () => {
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     axios({
-        url: "/api/post/judgeLike?id=" + id,
+        url: "/api/post/judgeLike/" + id,
         method: 'get',
         headers: {
-            authorization: token
+            token: token
         },
     }).then((res) => {
         console.log(res);

@@ -57,11 +57,11 @@ const submitForm = () => {
             return false;
         }
         else {
-            let token = sessionStorage.getItem("authorization");
+            let token = localStorage.getItem("token");
             console.log(token);
             axios({
                 headers: {
-                    authorization: token
+                    token : token
                 },
                 method: 'post',
                 url: "api/post/publish",

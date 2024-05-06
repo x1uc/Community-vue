@@ -51,7 +51,7 @@
                 <div v-for="item in MyLikeList" :key="item">
                     <el-card style="width: 900px; min-height: 100px;">
                         <div>文章标题
-                            <a :href="'#/postContent' + item.entityId" style="text-decoration: none;">{{ item.title }}</a>
+                            <a :href="'#/postContent' + item.postId" style="text-decoration: none;">{{ item.title }}</a>
                         </div>
                     </el-card>
                 </div>
@@ -130,14 +130,14 @@ const handleExceed = () => {
 
 
 const getAvatar = () => {
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     if (token == null || token == "") {
         proxy.Message.error("未登录，若已登录请刷新尝试");
     }
     axios({
         url: "/api/user/avatar",
         headers: {
-            authorization: token
+            token : token
         },
     }).then((res) => {
         circleUrl.value = baseUrl + res.data.data;
@@ -147,11 +147,11 @@ const getAvatar = () => {
 const MyLikeList = ref();
 
 const getMyLikeList = () => {
-    let token = sessionStorage.getItem("authorization");
+    let token = localStorage.getItem("token");
     axios({
-        url: "/api/message/MyLike",
+        url: "/api/post/getMyLike",
         headers: {
-            authorization: token
+            token: token
         },
         data: {
             currentPage: 1,
@@ -160,7 +160,7 @@ const getMyLikeList = () => {
         method: 'post'
     }).then((res) => {
         if (res.data.code == 200) {
-            MyLikeList.value = res.data.data.myLikeList;
+            MyLikeList.value = res.data.data.records;
             total.value = res.data.data.total;
             console.log(MyLikeList.value);
         }
